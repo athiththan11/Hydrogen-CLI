@@ -1,6 +1,5 @@
 const { Command, flags } = require('@oclif/command');
-
-const { ExecutionPlans, DatasourceConfigs, Docs } = require('../../../../hydrogen-core');
+const { ExecutionPlans, DatasourceConfigs, Docs, Docker } = require('../../../../hydrogen-core');
 
 class DatasourceAPIMCommand extends Command {
 	async run() {
@@ -9,17 +8,36 @@ class DatasourceAPIMCommand extends Command {
 		const version = flags.version;
 		const datasource = flags.datasource;
 		const replace = flags.replace;
+		const container = flags.container;
+		const generate = flags.generate;
+		const setup = flags.setup;
 
-		if (replace) {
+		if (replace || setup) {
 			if (datasource === 'mysql') {
 				this.log(`Starting to configure WSO2 API Manager ${version}`);
-				await ExecutionPlans.Datasource.replaceAPIManagerAMDatasource(
-					process.cwd(),
-					DatasourceConfigs.MySQL.getDatasourceConfigs('apim', { replace })
-				);
-				Docs.DatasourceDriver.generateDBDriverDocs('mysql');
+				if (replace) {
+					await ExecutionPlans.Datasource.replaceAPIManagerAMDatasource(
+						process.cwd(),
+						DatasourceConfigs.MySQL.getDatasourceConfigs('apim', { replace })
+					);
+					if (container) {
+						await Docker.MySQL.createMySQLDockerContainer('apim', { replace, generate }, process.cwd());
+					}
+				}
+				if (setup) {
+					await ExecutionPlans.Datasource.configureAPIManagerDatasources(
+						process.cwd(),
+						DatasourceConfigs.MySQL.getDatasourceConfigs('apim', { setup })
+					);
+					if (container) {
+						await Docker.MySQL.createMySQLDockerContainer('apim', { setup, generate }, process.cwd());
+					}
+                }
+                Docs.DatasourceDriver.generateDBDriverDocs('mysql');
 			}
-		} else {
+		}
+
+		if (!replace && !setup) {
 			this._help();
 		}
 	}
@@ -36,6 +54,13 @@ $ hydrogen datasource:apim --replace -v 2.6 --datasource mysql`,
 ];
 
 DatasourceAPIMCommand.flags = {
+	container: flags.boolean({
+		char: 'c',
+		description: 'create a docker container for the datasource',
+		hidden: false,
+		multiple: false,
+		required: false,
+	}),
 	datasource: flags.string({
 		char: 'd',
 		description: 'the type of datasource. refer to the supported options below',
@@ -44,11 +69,26 @@ DatasourceAPIMCommand.flags = {
 		required: true,
 		options: ['mysql'],
 	}),
+	generate: flags.boolean({
+		char: 'g',
+		description: 'create database and tables in the docker container',
+		hidden: false,
+		multiple: false,
+		required: false,
+		dependsOn: ['container'],
+	}),
 	replace: flags.boolean({
 		char: 'r',
 		description: 'replace AM_DB H2 datasource configurations',
 		hidden: false,
 		multiple: false,
+	}),
+	setup: flags.boolean({
+		char: 's',
+		description: 'configure AM, UM & REG datasources',
+		hidden: false,
+		multiple: false,
+		exclusive: ['replace'],
 	}),
 	version: flags.string({
 		char: 'v',
