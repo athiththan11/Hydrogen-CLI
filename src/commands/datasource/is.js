@@ -12,7 +12,7 @@ class DatasourceISCommand extends Command {
 		const generate = flags.generate;
 
 		if (replace) {
-			this.log(`Starting to configure WSO2 API Manager ${version}`);
+			this.log(`Starting to configure WSO2 Identity Server ${version}`);
 			// mysql datasource block
 			if (datasource === ConfigMaps.Hydrogen.datasource.mysql) {
 				await ExecutionPlans.Datasource.replaceISCarbonDatasource(
