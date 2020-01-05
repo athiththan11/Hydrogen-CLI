@@ -44,6 +44,22 @@ class DatasourceISCommand extends Command {
 				}
 				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.postgre);
 			}
+
+			// mssql datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.mssql) {
+				await ExecutionPlans.Datasource.replaceISCarbonDatasource(
+					process.cwd(),
+					DatasourceConfigs.MSSQL.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.is, { replace })
+				);
+				if (container) {
+					await Docker.MSSQL.createMSSQLDockerContainer(
+						ConfigMaps.Hydrogen.platform.is,
+						{ replace, generate },
+						process.cwd()
+					);
+				}
+				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
+			}
 		}
 
 		if (!replace) {
@@ -76,7 +92,11 @@ DatasourceISCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: true,
-		options: [ConfigMaps.Hydrogen.datasource.mysql, ConfigMaps.Hydrogen.datasource.postgre],
+		options: [
+			ConfigMaps.Hydrogen.datasource.mysql,
+			ConfigMaps.Hydrogen.datasource.postgre,
+			ConfigMaps.Hydrogen.datasource.mssql,
+		],
 	}),
 	generate: flags.boolean({
 		char: 'g',
