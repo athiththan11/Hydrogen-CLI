@@ -167,11 +167,11 @@ USAGE
   $ hydrogen datasource:is [FLAG] [ARG]
 
 OPTIONS
-  -c, --contianer                 create a docker container for the datasource
-  -d, --datasource=mysql|postgre  (required) the type of datasource. refer to the supported options below
-  -g, --generate                  create database and tables in the docker container
-  -r, --replace                   replace Carbon H2 datasource configuration
-  -v, --version=5.7               (required) [default: 5.7] version of the WSO2 Identity Server
+  -c, --contianer                       create a docker container for the datasource
+  -d, --datasource=mysql|postgre|mssql  (required) the type of datasource. refer to the supported options below
+  -g, --generate                        create database and tables in the docker container
+  -r, --replace                         replace Carbon H2 datasource configuration
+  -v, --version=5.7                     (required) [default: 5.7] version of the WSO2 Identity Server
 
 DESCRIPTION
   ...
