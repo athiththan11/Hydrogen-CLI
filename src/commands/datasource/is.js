@@ -28,6 +28,22 @@ class DatasourceISCommand extends Command {
 				}
 				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mysql);
 			}
+
+			// postgre datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.postgre) {
+				await ExecutionPlans.Datasource.replaceISCarbonDatasource(
+					process.cwd(),
+					DatasourceConfigs.Postgre.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.is, { replace })
+				);
+				if (container) {
+					await Docker.Postgre.createPostgreDockerContainer(
+						ConfigMaps.Hydrogen.platform.is,
+						{ replace, generate },
+						process.cwd()
+					);
+				}
+				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.postgre);
+			}
 		}
 
 		if (!replace) {
@@ -60,7 +76,7 @@ DatasourceISCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: true,
-		options: [ConfigMaps.Hydrogen.datasource.mysql],
+		options: [ConfigMaps.Hydrogen.datasource.mysql, ConfigMaps.Hydrogen.datasource.postgre],
 	}),
 	generate: flags.boolean({
 		char: 'g',
