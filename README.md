@@ -41,6 +41,7 @@ Checkout for more on [**Hydrogen CLI WiKi**](https://github.com/athiththan11/hyd
   - [Datasource](#datasource)
     - [Usage](#usage)
     - [datasource:apim](#datasourceapim)
+    - [datasource:is](#datasourceis)
 - [Examples](#examples)
   - [Datasource Examples](#datasource-examples)
 - [License](#license)
@@ -123,6 +124,7 @@ DESCRIPTION
 
 COMMANDS
   datasource:apim  Alter datasource configurations related WSO2 API Manager products with supported datasource config models
+  datasource:is    Alter datasource configurations related WSO2 Identity Server products with supported datasource config models
 ```
 
 #### datasource:apim
@@ -154,6 +156,30 @@ EXAMPLES
   $ hydrogen datasource:apim --setup -v 2.6 --datasource postgre
   Configure AM, UM & REG datasources with Postgre and create Docker container for the datasources
   $ hydrogen datasource:apim --setup -v 2.6 --datasource postgre --container --generate
+```
+
+#### datasource:is
+
+```shell
+Alter datasource configurations related WSO2 Identity Server products with supported datasource config models
+
+USAGE
+  $ hydrogen datasource:is [FLAG] [ARG]
+
+OPTIONS
+  -c, --contianer                 create a docker container for the datasource
+  -d, --datasource=mysql|postgre  (required) the type of datasource. refer to the supported options below
+  -g, --generate                  create database and tables in the docker container
+  -r, --replace                   replace Carbon H2 datasource configuration
+  -v, --version=5.7               (required) [default: 5.7] version of the WSO2 Identity Server
+
+DESCRIPTION
+  ...
+  Alter datasource configurations of WSO2 Identity Server based on your requirement
+
+EXAMPLE
+  Replace Carbon H2 datasource with MySQL
+  $ hydrogen datasource:is --replace -v 5.7 --datasource mysql
 ```
 
 <br />
