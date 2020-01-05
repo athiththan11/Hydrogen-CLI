@@ -122,6 +122,12 @@ Alter datasource configurations of WSO2 API Manager server based on your require
 DatasourceAPIMCommand.examples = [
 	`Replace AM_DB H2 datasource with MySQL
 $ hydrogen datasource:apim --replace -v 2.6 --datasource mysql`,
+	`Replace AM_DB H2 datasource with MySQL and create Docker container for the datasource
+$ hydrogen datasource:apim --replace -v 2.6 --datasource mysql --container --generate`,
+	`Configure AM, UM & REG datasource with Postgre
+$ hydrogen datasource:apim --setup -v 2.6 --datasource postgre`,
+    `Configure AM, UM & REG datasources with Postgre and create Docker container for the datasources
+$ hydrogen datasource:apim --setup -v 2.6 --datasource postgre --container --generate`
 ];
 
 DatasourceAPIMCommand.flags = {
