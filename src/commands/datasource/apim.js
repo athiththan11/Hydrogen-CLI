@@ -73,6 +73,37 @@ class DatasourceAPIMCommand extends Command {
 						);
 					}
 				}
+				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.postgre);
+			}
+
+			// mssql datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.mssql) {
+				if (replace) {
+					await ExecutionPlans.Datasource.replaceAPIManagerAMDatasource(
+						process.cwd(),
+						DatasourceConfigs.MSSQL.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { replace })
+					);
+					if (container) {
+						await Docker.MSSQL.createMSSQLDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ replace, generate },
+							process.cwd()
+						);
+					}
+				}
+				if (setup) {
+					await ExecutionPlans.Datasource.configureAPIManagerDatasources(
+						process.cwd(),
+						DatasourceConfigs.MSSQL.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { setup })
+					);
+					if (container) {
+						await Docker.MSSQL.createMSSQLDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup, generate },
+							process.cwd()
+						);
+					}
+				}
 				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
 			}
 		}
@@ -107,7 +138,11 @@ DatasourceAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: true,
-		options: [ConfigMaps.Hydrogen.datasource.mysql, ConfigMaps.Hydrogen.datasource.postgre],
+		options: [
+			ConfigMaps.Hydrogen.datasource.mysql,
+			ConfigMaps.Hydrogen.datasource.postgre,
+			ConfigMaps.Hydrogen.datasource.mssql,
+		],
 	}),
 	generate: flags.boolean({
 		char: 'g',
