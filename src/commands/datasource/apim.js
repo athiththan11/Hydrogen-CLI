@@ -131,6 +131,7 @@ DatasourceAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
+		dependsOn: ['datasource'],
 	}),
 	datasource: flags.string({
 		char: 'd',
@@ -157,6 +158,7 @@ DatasourceAPIMCommand.flags = {
 		description: 'replace AM_DB H2 datasource configurations',
 		hidden: false,
 		multiple: false,
+		exclusive: ['setup'],
 	}),
 	setup: flags.boolean({
 		char: 's',
