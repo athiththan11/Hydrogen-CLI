@@ -1,5 +1,5 @@
 const { Command, flags } = require('@oclif/command');
-const { ExecutionPlans, DatasourceConfigs, Docs, Docker } = require('../../../../hydrogen-core');
+const { ExecutionPlans, DatasourceConfigs, Utils, Docker, ConfigMaps } = require('../../../../hydrogen-core');
 
 class DatasourceAPIMCommand extends Command {
 	async run() {
@@ -13,27 +13,67 @@ class DatasourceAPIMCommand extends Command {
 		const setup = flags.setup;
 
 		if (replace || setup) {
-			if (datasource === 'mysql') {
-				this.log(`Starting to configure WSO2 API Manager ${version}`);
+			this.log(`Starting to configure WSO2 API Manager ${version}`);
+			// mysql datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.mysql) {
 				if (replace) {
 					await ExecutionPlans.Datasource.replaceAPIManagerAMDatasource(
 						process.cwd(),
-						DatasourceConfigs.MySQL.getDatasourceConfigs('apim', { replace })
+						DatasourceConfigs.MySQL.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { replace })
 					);
 					if (container) {
-						await Docker.MySQL.createMySQLDockerContainer('apim', { replace, generate }, process.cwd());
+						await Docker.MySQL.createMySQLDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ replace, generate },
+							process.cwd()
+						);
 					}
 				}
 				if (setup) {
 					await ExecutionPlans.Datasource.configureAPIManagerDatasources(
 						process.cwd(),
-						DatasourceConfigs.MySQL.getDatasourceConfigs('apim', { setup })
+						DatasourceConfigs.MySQL.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { setup })
 					);
 					if (container) {
-						await Docker.MySQL.createMySQLDockerContainer('apim', { setup, generate }, process.cwd());
+						await Docker.MySQL.createMySQLDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup, generate },
+							process.cwd()
+						);
 					}
-                }
-                Docs.DatasourceDriver.generateDBDriverDocs('mysql');
+				}
+				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mysql);
+			}
+
+			// postgre datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.postgre) {
+				if (replace) {
+					await ExecutionPlans.Datasource.replaceAPIManagerAMDatasource(
+						process.cwd(),
+						DatasourceConfigs.Postgre.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { replace })
+					);
+					if (container) {
+						await Docker.Postgre.createPostgreDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ replace, generate },
+							process.cwd()
+						);
+					}
+				}
+				if (setup) {
+					await ExecutionPlans.Datasource.configureAPIManagerDatasources(
+						process.cwd(),
+						DatasourceConfigs.Postgre.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { setup })
+					);
+					if (container) {
+						await Docker.Postgre.createPostgreDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup, generate },
+							process.cwd()
+						);
+					}
+				}
+				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
 			}
 		}
 
@@ -67,7 +107,7 @@ DatasourceAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: true,
-		options: ['mysql'],
+		options: [ConfigMaps.Hydrogen.datasource.mysql, ConfigMaps.Hydrogen.datasource.postgre],
 	}),
 	generate: flags.boolean({
 		char: 'g',
