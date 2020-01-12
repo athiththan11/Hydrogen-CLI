@@ -75,6 +75,10 @@ Alter datasource configurations of WSO2 Identity Server based on your requiremen
 DatasourceISCommand.examples = [
 	`Replace Carbon H2 datasource with MySQL
 $ hydrogen datasource:is --replace -v 5.7 --datasource mysql`,
+	`Replace Carbon H2 datasource with Postgre
+$ hydrogen datasource:is --replace -v 5.7 --datasource postgre`,
+	`Replace Carbon H2 datasource with Postgre and create Docker container for the datasource
+$ hydrogen datasource:is --replace -v 5.7 --datasource postgre --container --generate`
 ];
 
 DatasourceISCommand.flags = {
