@@ -8,7 +8,7 @@ class DatasourceISCommand extends Command {
 		const version = flags.version;
 		const datasource = flags.datasource;
 		const replace = flags.replace;
-		const container = flags.contianer;
+		const container = flags.container;
 		const generate = flags.generate;
 
 		if (replace) {
@@ -82,7 +82,7 @@ $ hydrogen datasource:is --replace -v 5.7 --datasource postgre --container --gen
 ];
 
 DatasourceISCommand.flags = {
-	contianer: flags.boolean({
+	container: flags.boolean({
 		char: 'c',
 		description: 'create a docker container for the datasource',
 		hidden: false,
