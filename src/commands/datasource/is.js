@@ -26,7 +26,7 @@ class DatasourceISCommand extends Command {
 						process.cwd()
 					);
 				}
-				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mysql);
+				await Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mysql);
 			}
 
 			// postgre datasource block
@@ -42,7 +42,7 @@ class DatasourceISCommand extends Command {
 						process.cwd()
 					);
 				}
-				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.postgre);
+				await Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.postgre);
 			}
 
 			// mssql datasource block
@@ -58,7 +58,7 @@ class DatasourceISCommand extends Command {
 						process.cwd()
 					);
 				}
-				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
+				await Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
 			}
 		}
 
