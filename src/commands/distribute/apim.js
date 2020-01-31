@@ -1,21 +1,61 @@
 const { Command, flags } = require('@oclif/command');
-const { ExecutionPlans, ConfigMaps } = require('../../../../hydrogen-core');
+const { ExecutionPlans, Utils, ConfigMaps } = require('../../../../hydrogen-core');
 
 class DistributeAPIMCommand extends Command {
-    async run() {
-        const { flags } = this.parse(DistributeAPIMCommand);
+	async run() {
+		const { flags } = this.parse(DistributeAPIMCommand);
 
-        const version = flags.version;
-        if (flags['multiple-gateway']) {
-            this.log(`Starting to configure WSO2 API Manager ${version}`);
-            if (flags['multiple-gateway']) {
-                this.log(`Deployment setup "Publishing Through Multiple Gateway"`);
-                // TODO: implement publish-through multiple gateway
-                await ExecutionPlans.Deployment.configurePublishMultipleGateway(process.cwd(), 2);
-            }
-        }
+		const version = flags.version;
+		if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
+			this.log(`Starting to configure WSO2 API Manager ${version}`);
+			if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
+				if (flags.nodes >= 2) {
+					this.log(
+						`Deployment setup "Publishing Through Multiple Gateway" with Gateway Nodes : ${flags.nodes}`
+					);
 
-    }
+					// TODO: get the configurations from file-system and pass
+					let environmentConfs = [
+						{
+							type: 'production',
+							'api-console': true,
+							_name: 'Production environment one',
+							_description: 'a sample environment',
+							_hostname: 'localhost',
+							username: 'something',
+							offset: 1
+						},
+						{
+							type: 'staging',
+							'api-console': true,
+							_name: 'Staging environment one',
+							_description: 'a sample stage environment',
+							_hostname: 'localhost',
+							offset: 2
+						}
+					];
+					let layoutConfs = {
+						_hostname: 'https://localhost',
+						thriftClientPort: '10397',
+						enableThriftServer: 'false',
+						offset: 0
+					};
+
+					await ExecutionPlans.Deployment.configurePublishMultipleGateway(
+						process.cwd(),
+						flags.nodes,
+						layoutConfs,
+						environmentConfs
+					);
+					Utils.Docs.generatePublishMultipleGatewayDocs(flags.nodes, layoutConfs);
+				} else {
+					// FIXME: change the error messages
+					this.log('\nERROR :: Number of Gateway nodes should be 2 (default) or more\n');
+					this._help();
+				}
+			}
+		}
+	}
 }
 
 DistributeAPIMCommand.usage = ['distribute:apim [FLAG] [ARG]'];
@@ -23,7 +63,10 @@ DistributeAPIMCommand.description = `Configure WSO2 API Manager products for dis
 ...
 Configure WSO2 API Manager products for distributed deployments and setups based on your requirement
 `;
-DistributeAPIMCommand.examples = [];
+DistributeAPIMCommand.examples = [
+	`Setup Publish through Multiple Gateway deployment with 2 Gateway Nodes and a AIO
+$ hydrogen distribute:apim --publish-multiple-gateway --nodes 2`
+];
 
 DistributeAPIMCommand.flags = {
 	container: flags.boolean({
@@ -40,11 +83,13 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: true,
+		default: ConfigMaps.Hydrogen.datasource.mysql,
 		options: [
 			ConfigMaps.Hydrogen.datasource.mysql,
 			ConfigMaps.Hydrogen.datasource.postgre,
 			ConfigMaps.Hydrogen.datasource.mssql
-		]
+		],
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
 	}),
 	generate: flags.boolean({
 		char: 'g',
@@ -54,12 +99,22 @@ DistributeAPIMCommand.flags = {
 		required: false,
 		dependsOn: ['container']
 	}),
-	'multiple-gateway': flags.boolean({
+	'publish-multiple-gateway': flags.boolean({
 		char: 'M',
 		description: 'deployment setup for publish through multiple-gateways',
 		hidden: false,
 		multiple: false,
 		required: false
+	}),
+	nodes: flags.integer({
+		char: 'n',
+		description: 'number of gateway nodes to be configured for publish-multiple-gateway layout',
+		hidden: false,
+		multiple: false,
+		required: true,
+		default: 2,
+		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway],
+		parse: Number
 	}),
 	version: flags.string({
 		char: 'v',
