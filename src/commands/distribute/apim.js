@@ -116,6 +116,13 @@ DistributeAPIMCommand.flags = {
 		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway],
 		parse: Number
 	}),
+	config: flags.string({
+		char: 'C',
+		description: 'JSON configuration path',
+		hidden: false,
+		required: false,
+		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+	}),
 	version: flags.string({
 		char: 'v',
 		description: 'version of the WSO2 API Manager',
