@@ -22,7 +22,9 @@
 
 A command line tool to alter and configure WSO2 servers for different requirements. The `hydrogen` supports to perform the following alterations and configurations ...
 
-* Replace H2 datasources of `WSO2 API Manager` with other supported datasources
+- Replace Carbon H2 datasources of `WSO2 Identity Server` with other supported datasources
+- Replace AM H2 datasource of `WSO2 API Manager` with other supported datasources
+- Set up AM, UM, REG datasources of `WSO2 API Manager` with other supported datasources
 
 & many more.
 
@@ -34,14 +36,15 @@ Checkout for more on [**Hydrogen CLI WiKi**](https://github.com/athiththan11/hyd
 
 - [Intro](#intro)
 - [Table of Contents](#table-of-contents)
-- [Install &amp; Run](#install-amp-run)
+- [Install & Run](#install--run)
   - [Dev Environment](#dev-environment)
   - [Troubleshoot](#troubleshoot)
 - [Commands](#commands)
   - [Datasource](#datasource)
-    - [Usage](#usage)
     - [datasource:apim](#datasourceapim)
     - [datasource:is](#datasourceis)
+  - [Distribute](#distribute)
+    - [distribute:apim](#distributeapim)
 - [Examples](#examples)
   - [Datasource Examples](#datasource-examples)
 - [License](#license)
@@ -50,7 +53,7 @@ Checkout for more on [**Hydrogen CLI WiKi**](https://github.com/athiththan11/hyd
 
 ## Install & Run
 
-> Recommended to use `NodeJS v8.9` in your environment use the `hydrogen` flawlessly.
+> Recommended to use `NodeJS v10.18.1` in your environment use the `hydrogen` flawlessly.
 
 ### Dev Environment
 
@@ -82,9 +85,9 @@ Error: /node_modules/libxmljs/build/xmljs.node: invalid ELF header
     at Object.<anonymous> (~/node_modules/libxmljs/lib/bindings.js:1:99)
 ```
 
-* Check your locally installed Node version. If you have no Node installed or if you have any higher versions than v8.9, then install Node v8.9.0 using NVM (nvm helps to manage and run different node versions)
-* Delete the `node_modules` folder from the `hydrogen` directory (extracted directory)
-* Execute `npm install` from the root path of `hydrogen`
+- Check your locally installed Node version. If you have no Node installed or if you have any higher versions than v8.9, then install Node v8.9.0 using NVM (nvm helps to manage and run different node versions)
+- Delete the `node_modules` folder from the `hydrogen` directory (extracted directory)
+- Execute `npm install` from the root path of `hydrogen`
 
 This will re-install all defined dependencies and builds to work with your environment as well as with `NodeJS v8.9.0` environment.
 
@@ -100,12 +103,10 @@ Below listed are a couple of available commands and descriptions of `hydrogen CL
 
 ### Datasource
 
-#### Usage
-
 `Datasource` commands are used to alter and configure `master-datasource.xml` of WSO2 servers for the following use-cases
 
-* Replace AM_DB H2 datasource with other supported datasources. For example: MySQL, Postgre, MSSQL etc.
-* Configure AM, UM & REG datasources
+- Replace AM_DB H2 datasource with other supported datasources. For example: MySQL, Postgre, MSSQL etc.
+- Configure AM, UM & REG datasources
 
 You can list all available `datasource` commands by executing `hydrogen datasource --help`.
 
@@ -184,18 +185,87 @@ EXAMPLE
 
 <br />
 
+### Distribute
+
+`Distribute` commands are used to configure deployment setups for `WSO2 API Manager` servers.
+
+```shell
+Configure WSO2 platforms for different distributed setups
+
+USAGE
+  $ hydrogen distribute [COMMAND]
+
+DESCRIPTION
+  ...
+  Configure WSO2 platforms with available distributed setups based on your requirements
+
+  Use the following command to list all available 'Distribute' related commands
+  $ hydrogen distribute --help
+
+COMMANDS
+  distribute:apim  Configure WSO2 API Manager products for distributed deployments with supported config models
+```
+
+#### distribute:apim
+
+```shell
+Configure WSO2 API Manager products for distributed deployments with supported config models
+
+USAGE
+  $ hydrogen distribute:apim [FLAG] [ARG]
+
+OPTIONS
+  -M, --publish-multiple-gateway        deployment setup for publish through multiple-gateways
+  -c, --container                       create a docker container for the datasource
+  -d, --datasource=mysql|postgre|mssql  (required) [default: mysql] the type of datasource. refer to the supported options below
+  -g, --generate                        create database and tables in the docker container
+  -n, --nodes=nodes                     (required) [default: 2] number of gateway nodes to be configured for publish-multiple-gateway layout
+  -v, --version=2.6                     (required) [default: 2.6] version of the WSO2 API Manager
+
+DESCRIPTION
+  ...
+  Configure WSO2 API Manager products for distributed deployments and setups based on your requirement
+
+EXAMPLE
+  Setup Publish through Multiple Gateway deployment with 2 Gateway Nodes and a AIO
+  $ hydrogen distribute:apim --publish-multiple-gateway --nodes 2
+```
+
+<br />
+
 ## Examples
 
 ### Datasource Examples
 
-* Need to configure `WSO2 API Manager v2.6` replacing the defualt shipped AM_DB H2 datasource with `Postgre`
-  * Download and extract a fresh-pack of `WSO2 API Manager v2.6`
-  * Fire up a terminal and navigate to the root directory of the extracted `WSO2 APIM` server
-  * Execute the following
+- Need to configure `WSO2 Identity Server v5.7` replacing the default shipped Carbon H2 datasource with `Postgre`
+  - Download and extract a fresh-pack of `WSO2 Identity Server v5.7`
+  - Fire up a terminal and navigate to the root directory of the extracted `WSO2 IS` server
+  - Execute the following
 
     ```shell
-    # from root directory of wso2 apim
+    # from root directory of wso2is | inside wso2is-5.7.0
+    hydrogen datasource:is --replace -v 5.7 --datasource postgre
+    ```
+
+- Need to configure `WSO2 API Manager v2.6` replacing the defualt shipped AM_DB H2 datasource with `Postgre`
+  - Download and extract a fresh-pack of `WSO2 API Manager v2.6`
+  - Fire up a terminal and navigate to the root directory of the extracted `WSO2 APIM` server
+  - Execute the following
+
+    ```shell
+    # from root directory of wso2 apim | inside wso2am-2.6.0
     hydrogen datasource:apim --replace -v 2.6 --datasource postgre
+    ```
+
+- Need to configure `WSO2 API Manager v2.6` setting up AM, UM, and REG datasource with `Postgre` and also to generate a Postgre Docker container with the databases and tables
+  - Download and extract a fresh-pack of `WSO2 API Manager v2.6`
+  - Start the Docker service in your environment (if you don't have Docker installed, install Docker before executing the command to work without any errors)
+  - Fire up a terminal and navigate to the root directory of the extracted `WSO2 APIM` server
+  - Execute the following
+
+    ```shell
+    # from root directory of wso2 apim | inside wso2am-2.6.0
+    hydrogen datasource:apim --setup -v 2.6 --datasource postgre --container --generate
     ```
 
 ## License
