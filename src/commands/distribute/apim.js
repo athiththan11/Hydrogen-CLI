@@ -1,9 +1,15 @@
 const { Command, flags } = require('@oclif/command');
-const { ExecutionPlans, Utils, ConfigMaps } = require('../../../../hydrogen-core');
+const { ExecutionPlans, Utils, ConfigMaps, Samples, Schemas } = require('../../../../hydrogen-core');
 
 class DistributeAPIMCommand extends Command {
 	async run() {
 		const { flags } = this.parse(DistributeAPIMCommand);
+
+		// config parser
+		let config = {};
+		if (flags.config) {
+			config = await Utils.Parser.configParser(require('path').join(process.cwd(), flags.config));
+		}
 
 		const version = flags.version;
 		if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
@@ -47,10 +53,9 @@ class DistributeAPIMCommand extends Command {
 						layoutConfs,
 						environmentConfs
 					);
-					Utils.Docs.generatePublishMultipleGatewayDocs(flags.nodes, layoutConfs);
+					await Utils.Docs.generatePublishMultipleGatewayDocs(flags.nodes, layoutConfs);
 				} else {
-					// FIXME: change the error messages
-					this.log('\nERROR :: Number of Gateway nodes should be 2 (default) or more\n');
+					this.log('\n' + 'ERROR :: Number of Gateway nodes should be 2 (default) or more' + '\n');
 					this._help();
 				}
 			}
