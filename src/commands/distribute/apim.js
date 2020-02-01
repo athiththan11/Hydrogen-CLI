@@ -19,13 +19,13 @@ class DistributeAPIMCommand extends Command {
 				let environmentConfs = Samples.Models.environmentConfs;
 				let layoutConfs = Samples.Models.layoutConfs;
 
-				if (flags.config) {
+				if (flags.config && config != null) {
 					// validate the parsed configuration against the schema model
 					let valid = await Utils.Parser.validateConfigs(
 						Schemas.LayoutConfs.publishMultipleGatewaySchema,
 						config
 					);
-					this.log(valid);
+
 					// if validation fails stop the process
 					if (!valid.valid) {
 						return valid.message == null
