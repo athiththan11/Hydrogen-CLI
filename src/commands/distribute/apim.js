@@ -14,6 +14,7 @@ class DistributeAPIMCommand extends Command {
 		const version = flags.version;
 		if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
 			this.log(`Starting to configure WSO2 API Manager ${version}`);
+			// publish-multiple-gateway block
 			if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
 				// set sample model configurations
 				let environmentConfs = Samples.Models.environmentConfs;
@@ -37,18 +38,18 @@ class DistributeAPIMCommand extends Command {
 					layoutConfs = config.layoutConfs;
 				}
 
-				if (flags.nodes >= 2) {
+				if (flags.count >= 2) {
 					this.log(
-						`Deployment setup "Publishing Through Multiple Gateway" with Gateway Nodes : ${flags.nodes}`
+						`Deployment setup "Publishing Through Multiple Gateway" with Gateway Nodes : ${flags.count}`
 					);
 
 					await ExecutionPlans.Deployment.configurePublishMultipleGateway(
 						process.cwd(),
-						flags.nodes,
+						flags.count,
 						layoutConfs,
 						environmentConfs
 					);
-					await Utils.Docs.generatePublishMultipleGatewayDocs(flags.nodes, layoutConfs);
+					await Utils.Docs.generatePublishMultipleGatewayDocs(flags.count, layoutConfs);
 				} else {
 					this.log('\n' + 'ERROR :: Number of Gateway nodes should be 2 (default) or more' + '\n');
 					this._help();
@@ -104,17 +105,16 @@ DistributeAPIMCommand.flags = {
 		description: 'deployment setup for publish through multiple-gateways',
 		hidden: false,
 		multiple: false,
-		required: false
+		required: false,
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm]
 	}),
-	nodes: flags.integer({
+	count: flags.integer({
 		char: 'n',
 		description: 'number of gateway nodes to be configured for publish-multiple-gateway layout',
 		hidden: false,
 		multiple: false,
-		required: true,
-		default: 2,
-		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway],
-		parse: Number
+		required: false,
+		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
 	}),
 	config: flags.string({
 		char: 'C',
