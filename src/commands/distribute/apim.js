@@ -1,11 +1,21 @@
 const { Command, flags } = require('@oclif/command');
-const { DatasourceConfigs, ExecutionPlans, Utils, ConfigMaps, Samples, Schemas } = require('../../../../hydrogen-core');
+const {
+	DatasourceConfigs,
+	Docker,
+	ExecutionPlans,
+	Utils,
+	ConfigMaps,
+	Samples,
+	Schemas
+} = require('../../../../hydrogen-core');
 
 class DistributeAPIMCommand extends Command {
 	async run() {
 		const { flags } = this.parse(DistributeAPIMCommand);
 
 		const datasource = flags.datasource;
+		const container = flags.container;
+		const generate = flags.generate;
 		const version = flags.version;
 
 		// config parser
@@ -66,9 +76,22 @@ class DistributeAPIMCommand extends Command {
 				let apimlayoutConfs = Samples.Models.apimlayoutConfs;
 				let iskmlayoutConfs = Samples.Models.iskmlayoutConfs;
 
-				// TODO: read & validate the configurations
+				if (flags.config && config != null) {
+					// validate the parsed configuration
+					let valid = await Utils.Parser.validateConfigs(Schemas.LayoutConfs.iskmSchema, config);
 
-				// TODO: get datasource configurations
+					// if validation fails stop the process
+					if (!valid.valid) {
+						return valid.message == null
+							? this.log('Given configuration is not complying with the expected schema')
+							: this.log(valid.message);
+					}
+
+					apimlayoutConfs = config.apimlayoutConfs;
+					iskmlayoutConfs = config.iskmlayoutConfs;
+				}
+
+				// retrieve datasource configurations
 				let datasourceConfs = null;
 				if (datasource === ConfigMaps.Hydrogen.datasource.mysql)
 					datasourceConfs = await DatasourceConfigs.MySQL.getDatasourceConfigs(
@@ -95,9 +118,31 @@ class DistributeAPIMCommand extends Command {
 						apimlayoutConfs,
 						iskmlayoutConfs
 					);
-				}
+					await Utils.Docs.generateIdentityServerasKMDocs(iskmlayoutConfs);
 
-				// TODO: error message no supported datasource defined
+					// container configurations
+					// mysql container
+					if (datasource === ConfigMaps.Hydrogen.datasource.mysql && container)
+						await Docker.MySQL.createMySQLDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup: true, 'is-km': true, generate },
+							process.cwd()
+						);
+					// postgre container
+					if (datasource === ConfigMaps.Hydrogen.datasource.postgre && container)
+						await Docker.Postgre.createPostgreDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup: true, 'is-km': true, generate },
+							process.cwd()
+						);
+					// mmsql container
+					if (datasource === ConfigMaps.Hydrogen.datasource.mssql && container)
+						await Docker.MSSQL.createMSSQLDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup: true, 'is-km': true, generate },
+							process.cwd()
+						);
+				}
 			}
 		}
 	}
@@ -110,7 +155,9 @@ Configure WSO2 API Manager products for distributed deployments and setups based
 `;
 DistributeAPIMCommand.examples = [
 	`Setup Publish through Multiple Gateway deployment with 2 Gateway Nodes and a AIO
-$ hydrogen distribute:apim --publish-multiple-gateway --nodes 2`
+$ hydrogen distribute:apim --publish-multiple-gateway --count 2`,
+	`Setup Identity Server as Key Manager with API Manager and Postgre datasource container
+$ hydrogen distribute:apim --is-km --datasource postgre --container --generate`
 ];
 
 DistributeAPIMCommand.flags = {
