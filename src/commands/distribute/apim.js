@@ -1,9 +1,12 @@
 const { Command, flags } = require('@oclif/command');
-const { ExecutionPlans, Utils, ConfigMaps, Samples, Schemas } = require('../../../../hydrogen-core');
+const { DatasourceConfigs, ExecutionPlans, Utils, ConfigMaps, Samples, Schemas } = require('../../../../hydrogen-core');
 
 class DistributeAPIMCommand extends Command {
 	async run() {
 		const { flags } = this.parse(DistributeAPIMCommand);
+
+		const datasource = flags.datasource;
+		const version = flags.version;
 
 		// config parser
 		let config = {};
@@ -11,8 +14,10 @@ class DistributeAPIMCommand extends Command {
 			config = await Utils.Parser.configParser(require('path').join(process.cwd(), flags.config));
 		}
 
-		const version = flags.version;
-		if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
+		if (
+			flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway] ||
+			flags[ConfigMaps.Hydrogen.layout.apim.iskm]
+		) {
 			this.log(`Starting to configure WSO2 API Manager ${version}`);
 			// publish-multiple-gateway block
 			if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
@@ -54,6 +59,45 @@ class DistributeAPIMCommand extends Command {
 					this.log('\n' + 'ERROR :: Number of Gateway nodes should be 2 (default) or more' + '\n');
 					this._help();
 				}
+			}
+			// is-km block
+			if (flags[ConfigMaps.Hydrogen.layout.apim.iskm]) {
+				// set sample model configurations
+				let apimlayoutConfs = Samples.Models.apimlayoutConfs;
+				let iskmlayoutConfs = Samples.Models.iskmlayoutConfs;
+
+				// TODO: read & validate the configurations
+
+				// TODO: get datasource configurations
+				let datasourceConfs = null;
+				if (datasource === ConfigMaps.Hydrogen.datasource.mysql)
+					datasourceConfs = await DatasourceConfigs.MySQL.getDatasourceConfigs(
+						ConfigMaps.Hydrogen.platform.apim,
+						{ setup: true }
+					);
+				if (datasource === ConfigMaps.Hydrogen.datasource.mssql)
+					datasourceConfs = await DatasourceConfigs.MSSQL.getDatasourceConfigs(
+						ConfigMaps.Hydrogen.platform.apim,
+						{ setup: true }
+					);
+				if (datasource === ConfigMaps.Hydrogen.datasource.postgre)
+					datasourceConfs = await DatasourceConfigs.Postgre.getDatasourceConfigs(
+						ConfigMaps.Hydrogen.platform.apim,
+						{ setup: true }
+					);
+
+				if (datasourceConfs != null) {
+					this.log(`Deployment setup "Identity Server as Key Manager"`);
+
+					await ExecutionPlans.Deployment.configureIdentityServerasKeyManager(
+						process.cwd(),
+						datasourceConfs,
+						apimlayoutConfs,
+						iskmlayoutConfs
+					);
+				}
+
+				// TODO: error message no supported datasource defined
 			}
 		}
 	}
@@ -100,6 +144,14 @@ DistributeAPIMCommand.flags = {
 		required: false,
 		dependsOn: ['container']
 	}),
+	'is-km': flags.boolean({
+		char: 'I',
+		description: 'deployment setup for identity server as key manager',
+		hidden: false,
+		multiple: false,
+		required: false,
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+	}),
 	'publish-multiple-gateway': flags.boolean({
 		char: 'M',
 		description: 'deployment setup for publish through multiple-gateways',
@@ -121,7 +173,7 @@ DistributeAPIMCommand.flags = {
 		description: 'JSON configuration path',
 		hidden: false,
 		required: false,
-		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway, ConfigMaps.Hydrogen.layout.apim.iskm]
 	}),
 	version: flags.string({
 		char: 'v',
