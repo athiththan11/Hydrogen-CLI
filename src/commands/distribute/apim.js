@@ -15,37 +15,32 @@ class DistributeAPIMCommand extends Command {
 		if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
 			this.log(`Starting to configure WSO2 API Manager ${version}`);
 			if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
+				// set sample model configurations
+				let environmentConfs = Samples.Models.environmentConfs;
+				let layoutConfs = Samples.Models.layoutConfs;
+
+				if (flags.config) {
+					// validate the parsed configuration against the schema model
+					let valid = await Utils.Parser.validateConfigs(
+						Schemas.LayoutConfs.publishMultipleGatewaySchema,
+						config
+					);
+					this.log(valid);
+					// if validation fails stop the process
+					if (!valid.valid) {
+						return valid.message == null
+							? this.log('Given configuration is not complying with the expected schema')
+							: this.log(valid.message);
+					}
+
+					environmentConfs = config.environmentConfs;
+					layoutConfs = config.layoutConfs;
+				}
+
 				if (flags.nodes >= 2) {
 					this.log(
 						`Deployment setup "Publishing Through Multiple Gateway" with Gateway Nodes : ${flags.nodes}`
 					);
-
-					// TODO: get the configurations from file-system and pass
-					let environmentConfs = [
-						{
-							type: 'production',
-							'api-console': true,
-							_name: 'Production environment one',
-							_description: 'a sample environment',
-							_hostname: 'localhost',
-							username: 'something',
-							offset: 1
-						},
-						{
-							type: 'staging',
-							'api-console': true,
-							_name: 'Staging environment one',
-							_description: 'a sample stage environment',
-							_hostname: 'localhost',
-							offset: 2
-						}
-					];
-					let layoutConfs = {
-						_hostname: 'https://localhost',
-						thriftClientPort: '10397',
-						enableThriftServer: 'false',
-						offset: 0
-					};
 
 					await ExecutionPlans.Deployment.configurePublishMultipleGateway(
 						process.cwd(),
