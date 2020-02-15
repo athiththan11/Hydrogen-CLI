@@ -26,7 +26,8 @@ class DistributeAPIMCommand extends Command {
 
 		if (
 			flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway] ||
-			flags[ConfigMaps.Hydrogen.layout.apim.iskm]
+			flags[ConfigMaps.Hydrogen.layout.apim.iskm] ||
+			flags[ConfigMaps.Hydrogen.layout.apim.distributed]
 		) {
 			this.log(`Starting to configure WSO2 API Manager ${version}`);
 			// publish-multiple-gateway block
@@ -144,6 +145,28 @@ class DistributeAPIMCommand extends Command {
 						);
 				}
 			}
+			// distributed block
+			if (flags[ConfigMaps.Hydrogen.layout.apim.distributed]) {
+				// set sample model configurations
+				let tmlayoutConfs = Samples.Models.tmlayoutConfs;
+				let storelayoutConfs = Samples.Models.storelayoutConfs;
+				let publisherlayoutConfs = Samples.Models.publisherlayoutConfsƒ;
+
+				// TODO: read config and parse
+
+				// TODO: datasource configurations | FIXME:
+				let datasourceConfs = await DatasourceConfigs.Postgre.getDatasourceConfigs(
+					ConfigMaps.Hydrogen.platform.apim,
+					{ setup: true }
+				);
+
+				// TODO: execute distributed execution plan
+				await ExecutionPlans.Deployment.configureDistributedDeployment(process.cwd(), datasourceConfs, {
+					publisherlayoutConfs,
+					storelayoutConfs,
+					tmlayoutConfs
+				});
+			}
 		}
 	}
 }
@@ -183,6 +206,14 @@ DistributeAPIMCommand.flags = {
 		],
 		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
 	}),
+	distributed: flags.boolean({
+		char: 'D',
+		description: 'deployment setup for distributed setup',
+		hidden: false,
+		multiple: false,
+		required: false,
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm, ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+	}),
 	generate: flags.boolean({
 		char: 'g',
 		description: 'create database and tables in the docker container',
@@ -197,7 +228,7 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway, ConfigMaps.Hydrogen.layout.apim.distributed]
 	}),
 	'publish-multiple-gateway': flags.boolean({
 		char: 'M',
@@ -205,7 +236,7 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm]
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm, ConfigMaps.Hydrogen.layout.apim.distributed]
 	}),
 	count: flags.integer({
 		char: 'n',
