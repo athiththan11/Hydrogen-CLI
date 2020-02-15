@@ -150,7 +150,7 @@ class DistributeAPIMCommand extends Command {
 				// set sample model configurations
 				let tmlayoutConfs = Samples.Models.tmlayoutConfs;
 				let storelayoutConfs = Samples.Models.storelayoutConfs;
-				let publisherlayoutConfs = Samples.Models.publisherlayoutConfsƒ;
+				let publisherlayoutConfs = Samples.Models.publisherlayoutConfs;
 
 				// TODO: read config and parse
 
