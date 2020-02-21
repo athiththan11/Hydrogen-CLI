@@ -96,6 +96,7 @@ DatasourceISCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: true,
+		default: ConfigMaps.Hydrogen.datasource.mysql,
 		options: [
 			ConfigMaps.Hydrogen.datasource.mysql,
 			ConfigMaps.Hydrogen.datasource.postgre,

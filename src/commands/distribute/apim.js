@@ -210,6 +210,14 @@ class DistributeAPIMCommand extends Command {
 			this.log(err);
 			this.error(err, { exit: true });
 		}
+
+		if (
+			!flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway] &&
+			!flags[ConfigMaps.Hydrogen.layout.apim.iskm] &&
+			!flags[ConfigMaps.Hydrogen.layout.apim.distributed]
+		) {
+			this._help();
+		}
 	}
 }
 
