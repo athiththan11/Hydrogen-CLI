@@ -1,4 +1,4 @@
-<h1 align='center'>hydrogen</h1>
+<h1 align='center'>Hydrogen CLI</h1>
 
 <p align='center'>An interactive CLI tool for WSO2 Servers</p>
 
@@ -13,8 +13,6 @@
 <br>
 
 <br>
-
-[:construction: Work In Progress]
 
 <br />
 
@@ -47,6 +45,7 @@ Checkout for more on [**Hydrogen CLI WiKi**](https://github.com/athiththan11/hyd
     - [distribute:apim](#distributeapim)
 - [Examples](#examples)
   - [Datasource Examples](#datasource-examples)
+  - [Distribute Examples](#distribute-examples)
 - [License](#license)
 
 <br />
@@ -85,11 +84,11 @@ Error: /node_modules/libxmljs/build/xmljs.node: invalid ELF header
     at Object.<anonymous> (~/node_modules/libxmljs/lib/bindings.js:1:99)
 ```
 
-- Check your locally installed Node version. If you have no Node installed or if you have any higher versions than v8.9, then install Node v8.9.0 using NVM (nvm helps to manage and run different node versions)
+- Check your locally installed Node version. If you have no Node installed or if you have any higher versions than v10.18.1, then install Node v10.18.1 using NVM (nvm helps to manage and run different node versions)
 - Delete the `node_modules` folder from the `hydrogen` directory (extracted directory)
 - Execute `npm install` from the root path of `hydrogen`
 
-This will re-install all defined dependencies and builds to work with your environment as well as with `NodeJS v8.9.0` environment.
+This will re-install all defined dependencies and builds to work with your environment as well as with `NodeJS v10.18.1` environment.
 
 <br />
 
@@ -215,20 +214,25 @@ USAGE
   $ hydrogen distribute:apim [FLAG] [ARG]
 
 OPTIONS
+  -C, --config=config                   JSON configuration path
+  -D, --distributed                     deployment setup for distributed setup
+  -I, --is-km                           deployment setup for identity server as key manager
   -M, --publish-multiple-gateway        deployment setup for publish through multiple-gateways
   -c, --container                       create a docker container for the datasource
   -d, --datasource=mysql|postgre|mssql  (required) [default: mysql] the type of datasource. refer to the supported options below
   -g, --generate                        create database and tables in the docker container
-  -n, --nodes=nodes                     (required) [default: 2] number of gateway nodes to be configured for publish-multiple-gateway layout
+  -n, --count=count                     number of gateway nodes to be configured for publish-multiple-gateway layout
   -v, --version=2.6                     (required) [default: 2.6] version of the WSO2 API Manager
 
 DESCRIPTION
   ...
   Configure WSO2 API Manager products for distributed deployments and setups based on your requirement
 
-EXAMPLE
+EXAMPLES
   Setup Publish through Multiple Gateway deployment with 2 Gateway Nodes and a AIO
-  $ hydrogen distribute:apim --publish-multiple-gateway --nodes 2
+  $ hydrogen distribute:apim --publish-multiple-gateway --count 2
+  Setup Identity Server as Key Manager with API Manager and Postgre datasource container
+  $ hydrogen distribute:apim --is-km --datasource postgre --container --generate
 ```
 
 <br />
@@ -266,6 +270,25 @@ EXAMPLE
     ```shell
     # from root directory of wso2 apim | inside wso2am-2.6.0
     hydrogen datasource:apim --setup -v 2.6 --datasource postgre --container --generate
+    ```
+
+### Distribute Examples
+
+- Need to configure `WSO2 API Manager v2.6` and `WSO2 Identity Server as Key Manager v5.7` with `Postgre` Datasource
+  - Download and extract both `WSO2 API Manager v2.6` & `WSO2 Identity Server as Key Manager v5.7` packs (Note: Place both the extracted packs inside a new folder)
+  
+    ```shell
+    - New Folder
+      - wso2am-2.6.0
+      - wso2is-km-5.7.0
+    ```
+
+  - Fire up a terminal and navigate to the root directory of the placed folder
+  - Execute the following
+  
+    ```shell
+    # from root directory of the extracted packs
+    hydrogen distribute:apim --is-km --datasource postgre
     ```
 
 ## License
