@@ -7,12 +7,13 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.node-version }}
-    runs-on: [ubuntu-latest, macos-latest, windows-latest, linux]
+    name: Build on ${{ matrix.node-version }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         node-version: [10.18.1]
+        os: [ubuntu-latest, macos-latest, windows-latest, linux]
 
     steps:
     - uses: actions/checkout@v2
