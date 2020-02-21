@@ -6,7 +6,7 @@
 	"bin": {
 		"hydrogen": "./bin/run"
 	},
-	"bugs": "https://github.com/athiththan11/hydrogen-CLI/issues",
+	"bugs": "https://github.com/athiththan11/hydrogen-cli/issues",
 	"dependencies": {
 		"@oclif/command": "^1.5.19",
 		"@oclif/config": "^1.13.3",
@@ -33,7 +33,7 @@
 		"/oclif.manifest.json",
 		"/src"
 	],
-	"homepage": "https://github.com/athiththan11/hydrogen-CLI",
+	"homepage": "https://github.com/athiththan11/hydrogen-cli",
 	"keywords": [
 		"hydrogen-cli"
 	],
@@ -47,7 +47,7 @@
 			"@oclif/plugin-autocomplete"
 		]
 	},
-	"repository": "athiththan11/hydrogen-CLI",
+	"repository": "athiththan11/hydrogen-cli",
 	"scripts": {
 		"postpack": "rimraf oclif.manifest.json",
 		"posttest": "eslint .",
