@@ -1,0 +1,29 @@
+name: Hydrogen CLI Build CI
+
+on:
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+    name: Build on ${{ matrix.node-version }}
+    runs-on: [ubuntu-latest, macos-latest, windows-latest, linux]
+
+    strategy:
+      matrix:
+        node-version: [10.18.1]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install
+    - run: npm run build --if-present
+    - run: npm test
+      env:
+        CI: true
+
+
