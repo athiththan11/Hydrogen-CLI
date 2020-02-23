@@ -14,6 +14,8 @@
 
 <br>
 
+![Hydrogen CLI Build CI](https://github.com/athiththan11/hydrogen-cli/workflows/Hydrogen%20CLI%20Build%20CI/badge.svg?branch=master&event=project)
+
 <br />
 
 ## Intro
