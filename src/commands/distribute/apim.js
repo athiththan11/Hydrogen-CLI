@@ -7,7 +7,7 @@ const {
 	ConfigMaps,
 	Samples,
 	Schemas
-} = require('../../../../hydrogen-core');
+} = require('@athiththan11/hydrogen-core');
 
 class DistributeAPIMCommand extends Command {
 	async run() {
@@ -157,7 +157,7 @@ class DistributeAPIMCommand extends Command {
 
 					if (flags.config && config != null) {
 						// validate the parsed configuration
-						let valid = await Utils.Parser.validateConfigs(Schemas.LayoutConfs.iskmSchema, config);
+						let valid = await Utils.Parser.validateConfigs(Schemas.LayoutConfs.distributedSchema, config);
 
 						// if validation fails stop the process
 						if (!valid.valid) {
@@ -201,8 +201,36 @@ class DistributeAPIMCommand extends Command {
 							tmlayoutConfs,
 							gatewaylayoutConfs
 						});
-						// TODO: generate docs
-						// TODO: container generation
+						await Utils.Docs.generateDistributedDocs({
+							kmlayoutConfs,
+							publisherlayoutConfs,
+							storelayoutConfs,
+							tmlayoutConfs,
+							gatewaylayoutConfs
+						});
+
+						// container configurations
+						// mysql container
+						if (datasource === ConfigMaps.Hydrogen.datasource.mysql && container)
+							await Docker.MySQL.createMySQLDockerContainer(
+								ConfigMaps.Hydrogen.platform.apim,
+								{ setup: true, distributed: true, generate },
+								process.cwd()
+							);
+						// postgre container
+						if (datasource === ConfigMaps.Hydrogen.datasource.postgre && container)
+							await Docker.Postgre.createPostgreDockerContainer(
+								ConfigMaps.Hydrogen.platform.apim,
+								{ setup: true, distributed: true, generate },
+								process.cwd()
+							);
+						// mmsql container
+						if (datasource === ConfigMaps.Hydrogen.datasource.mssql && container)
+							await Docker.MSSQL.createMSSQLDockerContainer(
+								ConfigMaps.Hydrogen.platform.apim,
+								{ setup: true, distributed: true, generate },
+								process.cwd()
+							);
 					}
 				}
 			}

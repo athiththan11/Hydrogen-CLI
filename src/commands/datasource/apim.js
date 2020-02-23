@@ -1,5 +1,5 @@
 const { Command, flags } = require('@oclif/command');
-const { ExecutionPlans, DatasourceConfigs, Utils, Docker, ConfigMaps } = require('../../../../hydrogen-core');
+const { ExecutionPlans, DatasourceConfigs, Utils, Docker, ConfigMaps } = require('@athiththan11/hydrogen-core');
 
 class DatasourceAPIMCommand extends Command {
 	async run() {
