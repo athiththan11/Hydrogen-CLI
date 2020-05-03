@@ -60,6 +60,22 @@ class DatasourceISCommand extends Command {
 				}
 				await Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
 			}
+
+			// oracle datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.oracle) {
+				await ExecutionPlans.Datasource.replaceISCarbonDatasource(
+					process.cwd(),
+					DatasourceConfigs.Oracle.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.is, { replace })
+				);
+				if (container) {
+					await Docker.Oracle.createOracleDockerContainer(
+						ConfigMaps.Hydrogen.platform.is,
+						{ replace, generate },
+						process.cwd()
+					);
+				}
+				await Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.oracle);
+			}
 		}
 
 		if (!replace) {
@@ -78,7 +94,7 @@ $ hydrogen datasource:is --replace -v 5.7 --datasource mysql`,
 	`Replace Carbon H2 datasource with Postgre
 $ hydrogen datasource:is --replace -v 5.7 --datasource postgre`,
 	`Replace Carbon H2 datasource with Postgre and create Docker container for the datasource
-$ hydrogen datasource:is --replace -v 5.7 --datasource postgre --container --generate`
+$ hydrogen datasource:is --replace -v 5.7 --datasource postgre --container --generate`,
 ];
 
 DatasourceISCommand.flags = {
@@ -101,6 +117,7 @@ DatasourceISCommand.flags = {
 			ConfigMaps.Hydrogen.datasource.mysql,
 			ConfigMaps.Hydrogen.datasource.postgre,
 			ConfigMaps.Hydrogen.datasource.mssql,
+			ConfigMaps.Hydrogen.datasource.oracle,
 		],
 	}),
 	generate: flags.boolean({

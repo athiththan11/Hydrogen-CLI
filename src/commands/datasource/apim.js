@@ -106,6 +106,37 @@ class DatasourceAPIMCommand extends Command {
 				}
 				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.mssql);
 			}
+
+			// oracle datasource block
+			if (datasource === ConfigMaps.Hydrogen.datasource.oracle) {
+				if (replace) {
+					await ExecutionPlans.Datasource.replaceAPIManagerAMDatasource(
+						process.cwd(),
+						DatasourceConfigs.Oracle.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { replace })
+					);
+					if (container) {
+						await Docker.Oracle.createOracleDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ replace, generate },
+							process.cwd()
+						);
+					}
+				}
+				if (setup) {
+					await ExecutionPlans.Datasource.configureAPIManagerDatasources(
+						process.cwd(),
+						DatasourceConfigs.Oracle.getDatasourceConfigs(ConfigMaps.Hydrogen.platform.apim, { setup })
+					);
+					if (container) {
+						await Docker.Oracle.createOracleDockerContainer(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup, generate },
+							process.cwd()
+						);
+					}
+				}
+				Utils.Docs.generateDBDriverDocs(ConfigMaps.Hydrogen.datasource.oracle);
+			}
 		}
 
 		if (!replace && !setup) {
@@ -126,8 +157,8 @@ $ hydrogen datasource:apim --replace -v 2.6 --datasource mysql`,
 $ hydrogen datasource:apim --replace -v 2.6 --datasource mysql --container --generate`,
 	`Configure AM, UM & REG datasource with Postgre
 $ hydrogen datasource:apim --setup -v 2.6 --datasource postgre`,
-    `Configure AM, UM & REG datasources with Postgre and create Docker container for the datasources
-$ hydrogen datasource:apim --setup -v 2.6 --datasource postgre --container --generate`
+	`Configure AM, UM & REG datasources with Postgre and create Docker container for the datasources
+$ hydrogen datasource:apim --setup -v 2.6 --datasource postgre --container --generate`,
 ];
 
 DatasourceAPIMCommand.flags = {
@@ -150,6 +181,7 @@ DatasourceAPIMCommand.flags = {
 			ConfigMaps.Hydrogen.datasource.mysql,
 			ConfigMaps.Hydrogen.datasource.postgre,
 			ConfigMaps.Hydrogen.datasource.mssql,
+			ConfigMaps.Hydrogen.datasource.oracle,
 		],
 	}),
 	generate: flags.boolean({
