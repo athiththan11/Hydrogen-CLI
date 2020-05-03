@@ -6,7 +6,7 @@ const {
 	Utils,
 	ConfigMaps,
 	Samples,
-	Schemas
+	Schemas,
 } = require('@athiththan11/hydrogen-core');
 
 class DistributeAPIMCommand extends Command {
@@ -216,14 +216,14 @@ class DistributeAPIMCommand extends Command {
 							publisherlayoutConfs,
 							storelayoutConfs,
 							tmlayoutConfs,
-							gatewaylayoutConfs
+							gatewaylayoutConfs,
 						});
 						await Utils.Docs.generateDistributedDocs({
 							kmlayoutConfs,
 							publisherlayoutConfs,
 							storelayoutConfs,
 							tmlayoutConfs,
-							gatewaylayoutConfs
+							gatewaylayoutConfs,
 						});
 
 						// container configurations
@@ -282,7 +282,7 @@ DistributeAPIMCommand.examples = [
 	`Setup Publish through Multiple Gateway deployment with 2 Gateway Nodes and a AIO
 $ hydrogen distribute:apim --publish-multiple-gateway --count 2`,
 	`Setup Identity Server as Key Manager with API Manager and Postgre datasource container
-$ hydrogen distribute:apim --is-km --datasource postgre --container --generate`
+$ hydrogen distribute:apim --is-km --datasource postgre --container --generate`,
 ];
 
 DistributeAPIMCommand.flags = {
@@ -292,7 +292,7 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		dependsOn: ['datasource']
+		dependsOn: ['datasource'],
 	}),
 	datasource: flags.string({
 		char: 'd',
@@ -307,7 +307,7 @@ DistributeAPIMCommand.flags = {
 			ConfigMaps.Hydrogen.datasource.mssql,
 			ConfigMaps.Hydrogen.datasource.oracle,
 		],
-		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway],
 	}),
 	distributed: flags.boolean({
 		char: 'D',
@@ -315,7 +315,7 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm, ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm, ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway],
 	}),
 	generate: flags.boolean({
 		char: 'g',
@@ -323,7 +323,7 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		dependsOn: ['container']
+		dependsOn: ['container'],
 	}),
 	'is-km': flags.boolean({
 		char: 'I',
@@ -331,7 +331,10 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway, ConfigMaps.Hydrogen.layout.apim.distributed]
+		exclusive: [
+			ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway,
+			ConfigMaps.Hydrogen.layout.apim.distributed,
+		],
 	}),
 	'publish-multiple-gateway': flags.boolean({
 		char: 'M',
@@ -339,7 +342,7 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm, ConfigMaps.Hydrogen.layout.apim.distributed]
+		exclusive: [ConfigMaps.Hydrogen.layout.apim.iskm, ConfigMaps.Hydrogen.layout.apim.distributed],
 	}),
 	count: flags.integer({
 		char: 'n',
@@ -347,14 +350,14 @@ DistributeAPIMCommand.flags = {
 		hidden: false,
 		multiple: false,
 		required: false,
-		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
+		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway],
 	}),
 	config: flags.string({
 		char: 'C',
 		description: 'JSON configuration path',
 		hidden: false,
 		required: false,
-		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway, ConfigMaps.Hydrogen.layout.apim.iskm]
+		dependsOn: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway, ConfigMaps.Hydrogen.layout.apim.iskm],
 	}),
 	version: flags.string({
 		char: 'v',
@@ -363,8 +366,8 @@ DistributeAPIMCommand.flags = {
 		multiple: false,
 		required: true,
 		default: '2.6',
-		options: ['2.6']
-	})
+		options: ['2.6'],
+	}),
 };
 
 module.exports = DistributeAPIMCommand;
