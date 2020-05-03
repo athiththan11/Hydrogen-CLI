@@ -110,6 +110,11 @@ class DistributeAPIMCommand extends Command {
 							ConfigMaps.Hydrogen.platform.apim,
 							{ setup: true }
 						);
+					if (datasource === ConfigMaps.Hydrogen.datasource.oracle)
+						datasourceConfs = await DatasourceConfigs.Oracle.getDatasourceConfigs(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup: true }
+						);
 
 					if (datasourceConfs != null) {
 						this.log(`Deployment setup "Identity Server as Key Manager"`);
@@ -140,6 +145,13 @@ class DistributeAPIMCommand extends Command {
 						// mmsql container
 						if (datasource === ConfigMaps.Hydrogen.datasource.mssql && container)
 							await Docker.MSSQL.createMSSQLDockerContainer(
+								ConfigMaps.Hydrogen.platform.apim,
+								{ setup: true, 'is-km': true, generate },
+								process.cwd()
+							);
+						// oracle container
+						if (datasource === ConfigMaps.Hydrogen.datasource.oracle && container)
+							await Docker.Oracle.createOracleDockerContainer(
 								ConfigMaps.Hydrogen.platform.apim,
 								{ setup: true, 'is-km': true, generate },
 								process.cwd()
@@ -190,6 +202,11 @@ class DistributeAPIMCommand extends Command {
 							ConfigMaps.Hydrogen.platform.apim,
 							{ setup: true }
 						);
+					if (datasource === ConfigMaps.Hydrogen.datasource.oracle)
+						datasourceConfs = await DatasourceConfigs.Oracle.getDatasourceConfigs(
+							ConfigMaps.Hydrogen.platform.apim,
+							{ setup: true }
+						);
 
 					if (datasourceConfs != null) {
 						this.log(`Deployment setup "Distributed"`);
@@ -227,6 +244,13 @@ class DistributeAPIMCommand extends Command {
 						// mmsql container
 						if (datasource === ConfigMaps.Hydrogen.datasource.mssql && container)
 							await Docker.MSSQL.createMSSQLDockerContainer(
+								ConfigMaps.Hydrogen.platform.apim,
+								{ setup: true, distributed: true, generate },
+								process.cwd()
+							);
+						// oracle container
+						if (datasource === ConfigMaps.Hydrogen.datasource.oracle && container)
+							await Docker.Oracle.createOracleDockerContainer(
 								ConfigMaps.Hydrogen.platform.apim,
 								{ setup: true, distributed: true, generate },
 								process.cwd()
@@ -280,7 +304,8 @@ DistributeAPIMCommand.flags = {
 		options: [
 			ConfigMaps.Hydrogen.datasource.mysql,
 			ConfigMaps.Hydrogen.datasource.postgre,
-			ConfigMaps.Hydrogen.datasource.mssql
+			ConfigMaps.Hydrogen.datasource.mssql,
+			ConfigMaps.Hydrogen.datasource.oracle,
 		],
 		exclusive: [ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]
 	}),
