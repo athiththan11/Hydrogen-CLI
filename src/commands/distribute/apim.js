@@ -32,7 +32,7 @@ class DistributeAPIMCommand extends Command {
 			) {
 				this.log(`Starting to configure WSO2 API Manager ${version}`);
 				// publish-multiple-gateway block
-				if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
+				if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway] && version === '2.6') {
 					// set sample model configurations
 					let environmentConfs = Samples.Models.environmentConfs;
 					let layoutConfs = Samples.Models.layoutConfs;
@@ -123,7 +123,8 @@ class DistributeAPIMCommand extends Command {
 							process.cwd(),
 							datasourceConfs,
 							apimlayoutConfs,
-							iskmlayoutConfs
+							iskmlayoutConfs,
+							{ version, datasource: { type: datasource } }
 						);
 						await Utils.Docs.generateIdentityServerasKMDocs(iskmlayoutConfs);
 
@@ -159,7 +160,7 @@ class DistributeAPIMCommand extends Command {
 					}
 				}
 				// distributed block
-				if (flags[ConfigMaps.Hydrogen.layout.apim.distributed]) {
+				if (flags[ConfigMaps.Hydrogen.layout.apim.distributed] && version === '2.6') {
 					// set sample model configurations
 					let tmlayoutConfs = Samples.Models.tmlayoutConfs;
 					let storelayoutConfs = Samples.Models.storelayoutConfs;
@@ -366,7 +367,7 @@ DistributeAPIMCommand.flags = {
 		multiple: false,
 		required: true,
 		default: '2.6',
-		options: ['2.6'],
+		options: ['2.6', '3.1'],
 	}),
 };
 
