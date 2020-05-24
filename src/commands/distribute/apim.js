@@ -32,7 +32,7 @@ class DistributeAPIMCommand extends Command {
 			) {
 				this.log(`Starting to configure WSO2 API Manager ${version}`);
 				// publish-multiple-gateway block
-				if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway] && version === '2.6') {
+				if (flags[ConfigMaps.Hydrogen.layout.apim.publishMultipleGateway]) {
 					// set sample model configurations
 					let environmentConfs = Samples.Models.environmentConfs;
 					let layoutConfs = Samples.Models.layoutConfs;
@@ -64,7 +64,8 @@ class DistributeAPIMCommand extends Command {
 							process.cwd(),
 							flags.count,
 							layoutConfs,
-							environmentConfs
+							environmentConfs,
+							{ version, 'publish-multiple-gateway': true }
 						);
 						await Utils.Docs.generatePublishMultipleGatewayDocs(flags.count, layoutConfs);
 					} else {
